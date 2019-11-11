@@ -43,7 +43,7 @@
         }
 
         .Question {
-            margin: 1rem;
+            margin: 1rem 0;
             background: rgba(255,255,255,.25);
             padding: 1rem;
             border-radius: 5px;
@@ -71,11 +71,11 @@
 
             <div id="title" class="ShowNotFirst">
                 <h5>Exagerration Equation</h5>
-                <div id="progress">Question Progress: <span id="meter">0</span>/11</div>
+                <div id="progress">Question Progress: <span id="currentquestion">0</span>/<span id="totalquestions">11</span></div>
             </div>
 
             <div class="alert alert-danger warning" role="alert">
-                <p>You must select an answer for this question to ensure the accuracy of the Exaggeration algorithm.</p>
+                <p>You must select an answer, to ensure the "accuracy" of the Exaggeration algorithm.</p>
             </div>
 
             <div id="Q1" class="Question">
@@ -178,7 +178,7 @@
 
             <div id="buttons" class="ShowNotFirst pt-2">
                 <button id="Back" class="Back ShowAfter1 btn btn-xl btn-primary">Back</button>
-                <button id="Next" class="Next btn btn-xl btn-primary">Continue</button>
+                <!--<button id="Next" class="Next btn btn-xl btn-primary">Continue</button>-->
                 <button id="Submit" class="ShowAtEnd btn btn-xl btn-primary">Submit</button>
             </div>
         </div>
@@ -195,6 +195,11 @@
     <script type="text/javascript">
         var progress = 0;
         var totalquestions = 11;
+
+        const setProgress = function () {
+            $("#currentquestion").text(progress);
+            $("#totalquestions").text(totalquestions);
+        }
 
         const showHide = function () {
             $(".warning").hide();
@@ -219,21 +224,39 @@
                 $(".ShowNotFirst").show();
             }
 
+            setProgress();
         }
 
-        $(function () {
-            $('.Next').click(function () {
-                if (progress > 0) {
-                    if (parseInt($("#Q" + progress + "select").val()) < 1) {
-                        $(".warning").show();
-                    } else {
-                        progress++;
-                        showHide();
-                    }
+        const doProgress = function () {
+            $(".warning").hide();
+            if (progress > 0) {
+                if (parseInt($("#Q" + progress + " select").val()) < 1) {
+                    $(".warning").show();
                 } else {
                     progress++;
                     showHide();
                 }
+            } else {
+                progress++;
+                showHide();
+            }            
+        }
+
+        $(function () {
+            var audioElement = document.createElement('audio');
+            audioElement.setAttribute('src', 'https://www.hoerspielbox.de/wp-content/blogs.dir/sites/1/2-5-10004.mp3');
+
+            $('#Submit').click(function() {
+                $(".Question").remove();
+                audioElement.play();
+            });
+
+            $("select").change(function () {
+                doProgress();
+            }); 
+
+            $(".Next").click(function () {
+                doProgress();
             });
 
             $('.Back').click(function () {
