@@ -19,7 +19,7 @@
             text-align: center;
         }
 
-        .Question, .ShowAtFirst, .ShowNotFirst, .ShowAtEnd, .ShowAfter1, .warning {
+        .Question, .ShowAtFirst, .ShowNotFirst, .ShowAtEnd, .ShowAfter1, .warning, .Finale, .results {
             display: none;
         }
 
@@ -52,10 +52,18 @@
         #buttons {
             text-align: right;
         }
-        
+
         .Question label {
             margin-bottom: 1rem;
         }
+
+        .results {
+            font-size: 1.5rem;
+        }
+                #results {
+            font-size: 2rem;
+        }
+
     </style>
 </head>
 
@@ -175,11 +183,21 @@
                     <option value="1">c. 3x</option>
                 </select>
             </div>
+            <div class="Finale">
+                <h3 class="mb-5">Calculating Results</h3>
+                <h5 id="statustext" class="mb-5">Be patient... very sophisticated calculations in use!</h5>
+                <div class="progress mb-5">
+                    <div id="progress" class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" aria-valuenow="75" aria-valuemin="0" aria-valuemax="100"></div>
+                </div>
+                <div class="results">
+                    <label>Results: </label> <span id="results" style="color: yellow;"></span>
+                </div>
+            </div>
 
             <div id="buttons" class="ShowNotFirst pt-2">
                 <button id="Back" class="Back ShowAfter1 btn btn-xl btn-primary">Back</button>
                 <!--<button id="Next" class="Next btn btn-xl btn-primary">Continue</button>-->
-                <button id="Submit" class="ShowAtEnd btn btn-xl btn-primary">Submit</button>
+                <button id="Submit" class="ShowAtEnd btn btn-xl btn-success">Submit</button>
             </div>
         </div>
     </div>
@@ -193,15 +211,30 @@
             crossorigin="anonymous"></script>
 
     <script type="text/javascript">
-        var progress = 0;
+        var progress = 11;
         var totalquestions = 11;
+        var calcMessageIntervalMs = 900;
+        var calcMessageLeadTimeMs = 2000;
+         //calcMessageIntervalMs = 10;
+         //calcMessageLeadTimeMs = 10;
+
+        var result = [
+            "A few",
+            "Rarely",
+            "Chill out it's cool",
+            "Aint no thang, grab a drink..."
+        ];
+
+        function getRandomInt(max) {
+            return Math.floor(Math.random() * Math.floor(max));
+        }
 
         const setProgress = function () {
             $("#currentquestion").text(progress);
             $("#totalquestions").text(totalquestions);
         }
 
-        const showHide = function () {
+        const hide = function () {
             $(".warning").hide();
             $(".Question").hide();
             $("#Q" + progress).show();
@@ -210,6 +243,12 @@
             $(".ShowNotFirst").hide();
             $(".ShowAtEnd").hide();
             $(".ShowAfter1").hide();
+            $(".Finale").hide();
+        }
+
+        const showHide = function () {
+
+            hide();
 
             if (progress === 0) {
                 $(".ShowAtFirst").show();
@@ -229,31 +268,78 @@
 
         const doProgress = function () {
             $(".warning").hide();
-            if (progress > 0) {
-                if (parseInt($("#Q" + progress + " select").val()) < 1) {
-                    $(".warning").show();
+            if (progress < totalquestions) {
+                if (progress > 0) {
+                    if (parseInt($("#Q" + progress + " select").val()) < 1) {
+                        $(".warning").show();
+                    } else {
+                        progress++;
+                        showHide();
+                    }
                 } else {
                     progress++;
                     showHide();
                 }
-            } else {
-                progress++;
-                showHide();
-            }            
+            }
         }
 
         $(function () {
             var audioElement = document.createElement('audio');
-            audioElement.setAttribute('src', 'https://www.hoerspielbox.de/wp-content/blogs.dir/sites/1/2-5-10004.mp3');
+            audioElement.setAttribute('src', 'dial.mp3');
 
-            $('#Submit').click(function() {
-                $(".Question").remove();
-                audioElement.play();
+            $('#Submit').click(function () {
+                progress++;
+                hide();
+
+                var $progress = $(".progress");
+                var $statustext = $("#statustext")
+                var percent = 0;
+
+                $(".Finale").show();
+
+                setTimeout(function () {
+                    audioElement.play();
+                    $progress.show();
+
+                    var progresstimer = setInterval(function () {
+                        $progress.children("#progress").css("width", percent + "%");
+                        percent = percent + 5;
+                        if (percent === 10) {
+                            $statustext.text("Status: Aquiring Answers...")
+                        }
+                        if (percent === 20) {
+                            $statustext.text("Status: Determining Severity...")
+                        }
+                        if (percent === 30) {
+                            $statustext.text("Status: Wasting Time...")
+                        }
+                        if (percent === 50) {
+                            $statustext.text("Status: Reticulating Splines...")
+                        }
+                        if (percent === 70) {
+                            $statustext.text("Status: Creating AI model...")
+                        }
+                        if (percent === 80) {
+                            $statustext.text("Status: Refining Results...")
+                        }
+                        if (percent === 90) {
+                            $statustext.text("Status: Looking Busy...")
+                        }
+                        if (percent >= 105) {
+                            clearInterval(progresstimer);
+                            $statustext.text("Status: Done!")
+
+                            var number = getRandomInt(result.length);
+                            $(".results").show();
+                            $("#results").text(result[number]);
+                        }
+                    }, calcMessageIntervalMs);
+                }, calcMessageLeadTimeMs)
             });
 
             $("select").change(function () {
                 doProgress();
-            }); 
+            });
 
             $(".Next").click(function () {
                 doProgress();
