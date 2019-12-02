@@ -67,7 +67,7 @@
     </style>
 </head>
 
-<body>
+<body>  
     <div class="content-wrapper">
         <div class="container">
             <div id="opener" class="ShowAtFirst mt-3">
@@ -185,13 +185,19 @@
             </div>
             <div class="Finale">
                 <h3 class="mb-5">Calculating Results</h3>
+                <audio>
+                      <source src="dial.mp3" type="audio/mpeg">
+                      <source src="dial.ogg" type="audio/ogg">
+                        Your browser does not support the audio element.
+                </audio>
                 <h5 id="statustext" class="mb-5">Be patient... very sophisticated calculations in use!</h5>
                 <div class="progress mb-5">
                     <div id="progress" class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" aria-valuenow="75" aria-valuemin="0" aria-valuemax="100"></div>
                 </div>
                 <div class="results">
-                    <label>Results: </label> <span id="results" style="color: yellow;"></span>
+                    <label>Results: </label> <span id="results" style="color: yellow;"></span>                    
                 </div>
+                <div id="sound"></div>
             </div>
 
             <div id="buttons" class="ShowNotFirst pt-2">
@@ -284,15 +290,9 @@
         }
 
         $(function () {
-            var audioElement = document.createElement('audio');
 
-
-            if((navigator.userAgent.match(/iPhone/i)) || (navigator.userAgent.match(/iPod/i)) || (navigator.userAgent.match(/iPad/i))) {
-                audioElement.setAttribute('src', 'dial.ogg');
-            }
-            else {
-                audioElement.setAttribute('src', 'dial.mp3');
-            }
+            let audio = new Audio('dial.mp3');
+            audio.play();
 
             $('#Submit').click(function () {
                 progress++;
@@ -305,7 +305,7 @@
                 $(".Finale").show();
 
                 setTimeout(function () {
-                    audioElement.play();
+                    audio.play();
                     $progress.show();
 
                     var progresstimer = setInterval(function () {
