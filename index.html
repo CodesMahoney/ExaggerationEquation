@@ -285,7 +285,14 @@
 
         $(function () {
             var audioElement = document.createElement('audio');
-            audioElement.setAttribute('src', 'dial.mp3');
+
+
+            if((navigator.userAgent.match(/iPhone/i)) || (navigator.userAgent.match(/iPod/i)) || (navigator.userAgent.match(/iPad/i))) {
+                audioElement.setAttribute('src', 'dial.ogg');
+            }
+            else {
+                audioElement.setAttribute('src', 'dial.mp3');
+            }
 
             $('#Submit').click(function () {
                 progress++;
